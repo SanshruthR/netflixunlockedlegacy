@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Legacy Netflix Unlocked</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #343a40;
+            color: white;
+            overflow: auto;
+            height: 100vh;
+        }
+        .btn-teal {
+            background-color: teal;
+            color: white;
+        }
+        .center-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+        }
+        .movie-poster {
+            max-width: 150px;
+            height: auto;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="center-content">
+            <h1>Netflix Unlocked </h1>
+            <h4>Legacy website</h4>
+            <form id="search-form">
+                <div class="form-group">
+            
+                    <input type="text" class="form-control form-control-lg" id="movie-title" placeholder="Enter movie title">
+                </div>
+                <button type="submit" class="btn btn-teal">Search</button>
+                <div>&nbsp;</div>
+            </form>
+            <div class="row" id="movie-list">
+                <!-- Movie search results will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#search-form').on('submit', function(e) {
+                e.preventDefault();
+                var movieTitle = $('#movie-title').val();
+                $.ajax({
+                    url: 'https://www.omdbapi.com/?apikey=62f3807a&t=' + movieTitle,
+                    type: 'GET',
+                    success: function(data) {
+                        // Fetch related movies from OMDB API
+                        $.ajax({
+                            url: 'https://www.omdbapi.com/?apikey=62f3807a&s=' + data.Title,
+                            type: 'GET',
+                            success: function(data) {
+                                var relatedMovies = data.Search;
+                                var movieList = $('#movie-list');
+                                movieList.empty();
+
+                                relatedMovies.forEach(function(movie) {
+                                    var movieDiv = $('<div>').addClass('col-md-4 mb-4');
+                                    var movieTitle = $('<h3>').text(movie.Title);
+                                    var moviePoster = $('<img>').addClass('movie-poster')
+                                        .attr('src', movie.Poster)
+                                        .attr('alt', movie.Title)
+                                        .attr('data-imdb-id', movie.imdbID)
+                                        .on('click', function() {
+                                            redirectTo123API($(this).data('imdb-id'));
+                                        });
+
+                                    movieDiv.append(moviePoster, movieTitle);
+                                    movieList.append(movieDiv);
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+        function redirectTo123API(imdbId) {
+            var serverName = "hydrax";
+            var apiUrl = `https://api.123movie.cc/imdb.php?imdb=${imdbId}&server=${serverName}`;
+            window.open(apiUrl);
+        }
+    </script>
+</body>
+</html>
